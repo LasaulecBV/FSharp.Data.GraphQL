@@ -9,7 +9,7 @@ open BenchmarkDotNet.Columns
 open BenchmarkDotNet.Exporters
 open BenchmarkDotNet.Diagnostics.Windows
 
-type GraphQLBenchConfig() as this= 
+type GraphQLBenchConfig() as this=
     inherit ManualConfig()
     do
         this.Add(StatisticColumn.Mean, StatisticColumn.Min, StatisticColumn.Max, StatisticColumn.OperationsPerSecond)

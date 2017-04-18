@@ -14,27 +14,27 @@ open FSharp.Data.GraphQL.Execution
 type INamed =
     interface
         abstract Name : string
-    end 
+    end
 
-type Dog = 
+type Dog =
     { Name: string; Barks: bool }
     interface INamed with
         member x.Name = x.Name
 
-type Cat = 
+type Cat =
     { Name: string; Meows: bool }
     interface INamed with
         member x.Name = x.Name
-        
+
 type Pet =
     | Cat of Cat
     | Dog of Dog
 
-type Person = 
+type Person =
     { Name: string; Pets: Pet list; Friends: INamed list }
     interface INamed with
         member x.Name = x.Name
-        
+
 let NamedType =
   Define.Interface<INamed>(
     name = "Named",
@@ -49,7 +49,7 @@ let DogType =
         Define.AutoField("name", String)
         Define.AutoField("barks", Boolean)
     ])
-    
+
 let CatType =
   Define.Object<Cat>(
     name = "Cat",
@@ -170,7 +170,7 @@ let ``Executes union types`` () =
                 "barks", upcast true]]]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Executes union types with inline fragments`` () =
     // This is the valid version of the query in the above test.
@@ -205,7 +205,7 @@ let ``Executes union types with inline fragments`` () =
                 "barks", upcast true]]]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Executes interface types`` () =
     // NOTE: This is an *invalid* query, but it should be an *executable* query.
@@ -234,7 +234,7 @@ let ``Executes interface types`` () =
                 "barks", upcast true ]]]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Executes interface types with inline fragments`` () =
     // This is the valid version of the query in the above test.
@@ -323,4 +323,3 @@ let ``Execute allows fragment conditions to be abstract types`` () =
                 "barks", upcast true]]]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    

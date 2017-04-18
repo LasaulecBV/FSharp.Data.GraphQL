@@ -31,7 +31,7 @@ and DeepTestSubject = {
 
 [<Fact>]
 let ``Execution handles basic tasks: executes arbitrary code`` () =
-    let rec data = 
+    let rec data =
         {
             a = "Apple"
             b = "Banana"
@@ -43,7 +43,7 @@ let ``Execution handles basic tasks: executes arbitrary code`` () =
             promise = async { return data }
             deep = deep
         }
-    and deep = 
+    and deep =
         {
             a = "Already Been Done"
             b = "Boring"
@@ -74,9 +74,9 @@ let ``Execution handles basic tasks: executes arbitrary code`` () =
           e
         }"""
 
-    let expected = 
+    let expected =
         NameValueLookup.ofList [
-            "a", upcast "Apple" 
+            "a", upcast "Apple"
             "b", upcast "Banana"
             "x", upcast "Cookie"
             "d", upcast "Donut"
@@ -88,7 +88,7 @@ let ``Execution handles basic tasks: executes arbitrary code`` () =
                "a", "Already Been Done" :> obj
                "b", upcast "Boring"
                "c", upcast ["Contrived" :> obj; null; upcast "Confusing"]
-            ] 
+            ]
         ]
 
     let DeepDataType =
@@ -111,7 +111,7 @@ let ``Execution handles basic tasks: executes arbitrary code`` () =
             Define.Field("f", String, fun _ dt -> dt.f)
             Define.Field("pic", String, "Picture resizer", [ Define.Input("size", Nullable Int) ], fun ctx dt -> dt.pic(ctx.Arg("size")))
             Define.AsyncField("promise", DataType, fun _ dt -> dt.promise)
-            Define.Field("deep", DeepDataType, fun _ dt -> dt.deep) 
+            Define.Field("deep", DeepDataType, fun _ dt -> dt.deep)
         ])
 
     let schema = Schema(DataType)
@@ -123,7 +123,7 @@ let ``Execution handles basic tasks: executes arbitrary code`` () =
 type TestThing = { mutable Thing: string }
 
 [<Fact(Skip="Fixme")>]
-let ``Execution handles basic tasks: merges parallel fragments`` () = 
+let ``Execution handles basic tasks: merges parallel fragments`` () =
     let ast = parse """{ a, ...FragOne, ...FragTwo }
 
       fragment FragOne on Type {
@@ -138,7 +138,7 @@ let ``Execution handles basic tasks: merges parallel fragments`` () =
 
     let rec Type =
       Define.Object(
-        name = "Type", 
+        name = "Type",
         fieldsFn = fun () ->
         [
             Define.Field("a", String, fun _ _ -> "Apple")
@@ -166,16 +166,16 @@ let ``Execution handles basic tasks: merges parallel fragments`` () =
     let result = sync <| schemaProcessor.AsyncExecute(ast, obj())
     noErrors result
     result.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
-let ``Execution handles basic tasks: threads root value context correctly`` () = 
+let ``Execution handles basic tasks: threads root value context correctly`` () =
     let query = "query Example { a }"
     let data = { Thing = "" }
     let Thing = Define.Object<TestThing>("Type", [  Define.Field("a", String, fun _ value -> value.Thing <- "thing"; value.Thing) ])
     let result = sync <| Executor(Schema(Thing)).AsyncExecute(parse query, data)
     noErrors result
     equals "thing" data.Thing
-    
+
 type TestTarget =
     { mutable Num: int option
       mutable Str: string option }
@@ -187,18 +187,18 @@ let ``Execution handles basic tasks: correctly threads arguments`` () =
       }"""
     let data = { Num = None; Str = None }
     let Type = Define.Object("Type", [
-        Define.Field("b", Nullable String, "", [ Define.Input("numArg", Int); Define.Input("stringArg", String) ], 
-            fun ctx value -> 
+        Define.Field("b", Nullable String, "", [ Define.Input("numArg", Int); Define.Input("stringArg", String) ],
+            fun ctx value ->
                 value.Num <- ctx.TryArg("numArg")
                 value.Str <- ctx.TryArg("stringArg")
-                value.Str) 
+                value.Str)
     ])
 
     let result = sync <| Executor(Schema(Type)).AsyncExecute(parse query, data)
     noErrors result
     equals (Some 123) data.Num
     equals (Some "foo") data.Str
-    
+
 type InlineTest = { A: string }
 
 [<Fact>]
@@ -210,8 +210,8 @@ let ``Execution handles basic tasks: uses the inline operation if no operation n
                 ]))
     let result = sync <| Executor(schema).AsyncExecute(parse "{ a }", { A = "b" })
     noErrors result
-    result.["data"] |> equals (upcast NameValueLookup.ofList ["a", "b" :> obj]) 
-    
+    result.["data"] |> equals (upcast NameValueLookup.ofList ["a", "b" :> obj])
+
 [<Fact>]
 let ``Execution handles basic tasks: uses the only operation if no operation name is provided`` () =
     let schema =
@@ -222,7 +222,7 @@ let ``Execution handles basic tasks: uses the only operation if no operation nam
     let result = sync <| Executor(schema).AsyncExecute(parse "query Example { a }", { A = "b" })
     noErrors result
     result.["data"] |> equals (upcast NameValueLookup.ofList ["a", "b" :> obj])
-    
+
 [<Fact>]
 let ``Execution handles basic tasks: uses the named operation if operation name is provided`` () =
     let schema =
@@ -253,7 +253,7 @@ let ``Execution when querying the same field twice will return it`` () =
         "b", upcast 2]
     noErrors result
     result.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execution when querying returns unique document id with response`` () =
     let schema =
@@ -267,4 +267,3 @@ let ``Execution when querying returns unique document id with response`` () =
     result1.["documentId"] |> notEquals (upcast Unchecked.defaultof<int>)
     let result2 = sync <| Executor(schema).AsyncExecute("query Example { a, b, a }", { A = "aa"; B = 2 })
     result1.["documentId"] |> equals (result2.["documentId"])
-    

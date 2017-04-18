@@ -15,15 +15,15 @@ type AsyncVal<'T> =
     new (async: Async<'T>) = { Value = Unchecked.defaultof<'T>; Async = async }
     member x.IsAsync = not (System.Object.ReferenceEquals(x.Async, null))
     member x.IsSync = System.Object.ReferenceEquals(x.Async, null)
-    override x.ToString () = 
-        if x.IsSync 
+    override x.ToString () =
+        if x.IsSync
         then "AsyncVal(" + x.Value.ToString() + ")"
         else "AsyncVal(Async<>)"
     static member Zero = AsyncVal<'T>(Unchecked.defaultof<'T>)
-    
+
 [<RequireQualifiedAccess>]
 module AsyncVal =
-    
+
     /// Returns true if AsyncVal wraps an Async computation, otherwise false.
     let inline isAsync (x: AsyncVal<'T>) = x.IsAsync
 
@@ -32,8 +32,8 @@ module AsyncVal =
 
     /// Returns value wrapped by current AsyncVal. If it's part of Async computation,
     /// it's executed synchronously and then value is returned.
-    let get (x: AsyncVal<'T>) = 
-        if x.IsSync 
+    let get (x: AsyncVal<'T>) =
+        if x.IsSync
         then x.Value
         else x.Async |> Async.RunSynchronously
 
@@ -42,7 +42,7 @@ module AsyncVal =
 
     /// Returns an AsyncVal wrapper around provided Async computation.
     let inline wrap (v: 'T) = AsyncVal<'T>(v)
-    
+
     /// Converts AsyncVal to Async computation.
     let toAsync (x: AsyncVal<'T>) =
         if x.IsSync
@@ -52,7 +52,7 @@ module AsyncVal =
     /// Returns an empty AsyncVal with immediatelly executed value.
     let inline empty<'T> : AsyncVal<'T> = AsyncVal<'T>.Zero
 
-    /// Maps content of AsyncVal using provided mapping function, returning new 
+    /// Maps content of AsyncVal using provided mapping function, returning new
     /// AsyncVal as the result.
     let map (fn: 'T -> 'U) (x: AsyncVal<'T>) =
         if x.IsSync
@@ -75,7 +75,7 @@ module AsyncVal =
         if x.IsSync
         then AsyncVal<_> (fn zero x.Value)
         else ofAsync <| async {
-            let! res = x.Async 
+            let! res = x.Async
             return fn zero res }
 
     /// Binds AsyncVal using binder function to produce new AsyncVal.
@@ -88,9 +88,9 @@ module AsyncVal =
             if bound.IsSync
             then return bound.Value
             else return! bound.Async }
-            
+
     /// Converts array of AsyncVals into AsyncVal with array results.
-    /// In case when are non-immediate values in provided array, they are 
+    /// In case when are non-immediate values in provided array, they are
     /// executed asynchronously, one by one with regard to their order in array.
     /// Returned array maintain order of values.
     let collectSequential (values: AsyncVal<'T> []) : AsyncVal<'T []> =
@@ -106,16 +106,16 @@ module AsyncVal =
                         let! r = v.Async
                         results.[i] <- r
                 return results }
-        else AsyncVal<_> (values |> Array.map (fun x -> x.Value)) 
-            
+        else AsyncVal<_> (values |> Array.map (fun x -> x.Value))
+
 
     /// Converts array of AsyncVals into AsyncVal with array results.
-    /// In case when are non-immediate values in provided array, they are 
+    /// In case when are non-immediate values in provided array, they are
     /// executed all in parallel, in unordered fashion. Order of values
     /// inside returned array is maintained.
     let collectParallel (values: AsyncVal<'T> []) : AsyncVal<'T []> =
         if values.Length = 0 then AsyncVal<_> [||]
-        else 
+        else
             let indexes = List<_>(0)
             let continuations = List<_>(0)
             let results = Array.zeroCreate values.Length
@@ -123,7 +123,7 @@ module AsyncVal =
                 let v = values.[i]
                 if v.IsSync
                 then results.[i] <- v.Value
-                else 
+                else
                     indexes.Add i
                     continuations.Add v.Async
             if indexes.Count = 0
@@ -139,22 +139,22 @@ type AsyncValBuilder () =
     member x.Return v = AsyncVal.wrap v
     member x.ReturnFrom (v: AsyncVal<_>) = v
     member x.ReturnFrom (a: Async<_>) = AsyncVal.ofAsync a
-    member x.Bind (v: AsyncVal<'T>, binder: 'T -> AsyncVal<'U>) = 
+    member x.Bind (v: AsyncVal<'T>, binder: 'T -> AsyncVal<'U>) =
         AsyncVal.bind binder v
-    member x.Bind (a: Async<'T>, binder: 'T -> AsyncVal<'U>) = 
+    member x.Bind (a: Async<'T>, binder: 'T -> AsyncVal<'U>) =
         AsyncVal.ofAsync <| async {
             let! value = a
             let bound = binder value
             if bound.IsSync
             then return bound.Value
             else return! bound.Async }
-            
+
 [<AutoOpen>]
 module AsyncExtensions =
-    
+
     /// Computation expression for working on AsyncVals.
     let asyncVal = AsyncValBuilder ()
-    
+
     /// Active pattern used for checking if AsyncVal contains immediate value.
     let (|Immediate|_|) (x: AsyncVal<'T>) = if x.IsSync then Some x.Value else None
 
@@ -164,7 +164,7 @@ module AsyncExtensions =
     type Microsoft.FSharp.Control.AsyncBuilder with
 
         member x.ReturnFrom (v: AsyncVal<'T>) =
-            if v.IsSync 
+            if v.IsSync
             then async.Return v.Value
             else async.ReturnFrom v.Async
 

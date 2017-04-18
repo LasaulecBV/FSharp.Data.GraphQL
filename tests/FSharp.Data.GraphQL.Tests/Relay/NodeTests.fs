@@ -11,14 +11,14 @@ open FSharp.Data.GraphQL.Types
 open FSharp.Data.GraphQL.Relay
 open FSharp.Data.GraphQL.Execution
 
-type Person = { Id: string; Name: string; Age: int } 
-type Car = { Id: string; Model: string; } 
+type Person = { Id: string; Name: string; Age: int }
+type Car = { Id: string; Model: string; }
 
 let people = [
     { Id = "1"; Name = "Alice"; Age = 18 }
     { Id = "2"; Name = "Bob"; Age = 23 }
     { Id = "3"; Name = "Susan"; Age = 37 }]
-    
+
 let cars = [
     { Id = "1"; Model = "Tesla S" }
     { Id = "2"; Model = "Shelby GT500" }]
@@ -56,7 +56,7 @@ let execAndValidateNode (query: string) expected =
     let result = sync <| Executor(schema).AsyncExecute(query)
     noErrors result
     result.["data"] |> equals (upcast NameValueLookup.ofList ["node", upcast expected])
-   
+
 [<Fact>]
 let ``Node with global ID gets correct record`` () =
     let query1 = """query ExampleQuery {
@@ -76,7 +76,7 @@ let ``Node with global ID gets correct record`` () =
             model
         }
     }"""
-    let expected2 =    
+    let expected2 =
       NameValueLookup.ofList [
         "model", upcast "Tesla S" ]
     execAndValidateNode query1 expected1

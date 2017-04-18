@@ -48,15 +48,15 @@ module TypeCompiler =
                 match t.Kind, t.OfType with
                 | TypeKind.NON_NULL, Some inner ->
                     receiveType false inner
-                | TypeKind.LIST, Some inner -> 
+                | TypeKind.LIST, Some inner ->
                     let ofType = receiveType false inner
                     ofType.MakeArrayType()
-                | other when nullable -> 
+                | other when nullable ->
                     optionType.MakeGenericType [| findType t |]
                 | other -> findType t
             receiveType true t
 
-    type ProviderSessionContext = 
+    type ProviderSessionContext =
         { Assembly: Assembly
           Namespace: string
           KnownTypes: Map<string, TypeReference> }
@@ -81,7 +81,7 @@ module TypeCompiler =
         // It's important to get the name of the field outside the quotation
         // in order to prevent errors at runtime
         let name = ifield.Name
-        p.GetterCode <- 
+        p.GetterCode <-
             match forceNullable, ifield.Type.Kind with
             | false, TypeKind.NON_NULL -> fun args ->
                 getDynamicField name args.[0]
@@ -96,7 +96,7 @@ module TypeCompiler =
 //        param
 //
 //    let genMethod (ctx: ProviderSessionContext) (t: IntrospectionType) ifield =
-//        let parameters = 
+//        let parameters =
 //            ifield.Args
 //            |> Array.map (genParam ctx t)
 //            |> Array.toList
@@ -116,10 +116,10 @@ module TypeCompiler =
 //        |> Array.toList
 //        |> t.AddMembers
 
-//    let genScalar (ctx: ProviderSessionContext) (itype: IntrospectionType) (t: ProvidedTypeDefinition) = 
+//    let genScalar (ctx: ProviderSessionContext) (itype: IntrospectionType) (t: ProvidedTypeDefinition) =
 //        if itype.Description.IsSome then t.AddXmlDoc(itype.Description.Value)
 
-    let genEnum (ctx: ProviderSessionContext) (itype: IntrospectionType) (t: ProvidedTypeDefinition) = 
+    let genEnum (ctx: ProviderSessionContext) (itype: IntrospectionType) (t: ProvidedTypeDefinition) =
         let genEnumValue (enumVal: IntrospectionEnumVal) =
             // Name must be obtained outside the quotation
             let name = enumVal.Name
@@ -134,7 +134,7 @@ module TypeCompiler =
         |> Seq.toList
         |> t.AddMembers
 
-    let genObject (ctx: ProviderSessionContext) (itype: IntrospectionType) (t: ProvidedTypeDefinition) = 
+    let genObject (ctx: ProviderSessionContext) (itype: IntrospectionType) (t: ProvidedTypeDefinition) =
         if itype.Description.IsSome then t.AddXmlDoc(itype.Description.Value)
         itype.Fields.Value
         |> Seq.choose (fun field ->
@@ -176,7 +176,7 @@ module TypeCompiler =
         |> Seq.toList
         |> t.AddMembers
 
-    let genType (ctx: ProviderSessionContext) (itype: IntrospectionType) (t: ProvidedTypeDefinition) = 
+    let genType (ctx: ProviderSessionContext) (itype: IntrospectionType) (t: ProvidedTypeDefinition) =
         match itype.Kind with
         | TypeKind.OBJECT | TypeKind.INTERFACE -> genObject ctx itype t
         | TypeKind.UNION -> genUnion ctx itype t
@@ -187,7 +187,7 @@ module TypeCompiler =
 //        | TypeKind.SCALAR -> genScalar ctx itype t
 //        | _ -> failwithf "Illegal type kind %s" (itype.Kind.ToString())
 
-    let initType (ctx: ProviderSessionContext) (itype: IntrospectionType) = 
+    let initType (ctx: ProviderSessionContext) (itype: IntrospectionType) =
         match itype.Kind with
         | TypeKind.OBJECT ->
             let typeName = itype.Name

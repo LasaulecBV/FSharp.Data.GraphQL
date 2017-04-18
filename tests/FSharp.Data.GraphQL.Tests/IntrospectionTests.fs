@@ -78,7 +78,7 @@ let ``Introspection works with query and mutation sharing same generic param`` =
     let schema = Schema(Query, Mutation)
     let introResult = Executor(schema).AsyncExecute(Introspection.introspectionQuery) |> sync
     ()
-    
+
 [<Fact>]
 let ``Default field type definitions are considered non-null`` () =
     let root = Define.Object("Query", [ Define.Field("onlyField", String) ])
@@ -120,7 +120,7 @@ let ``Default field type definitions are considered non-null`` () =
                             "ofType", null]]]]]]
     noErrors result
     result.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Nullabe field type definitions are considered nullable`` () =
     let root = Define.Object("Query", [ Define.Field("onlyField", Nullable String) ])
@@ -158,8 +158,8 @@ let ``Nullabe field type definitions are considered nullable`` () =
                         "name", upcast "String"
                         "ofType", null]]]]]
     noErrors result
-    result.["data"] |> equals (upcast expected) 
-    
+    result.["data"] |> equals (upcast expected)
+
 [<Fact>]
 let ``Default field args type definitions are considered non-null`` () =
     let root = Define.Object("Query", [ Define.Field("onlyField", String, "", [ Define.Input("onlyArg", Int) ], fun _ () -> null) ])
@@ -204,8 +204,8 @@ let ``Default field args type definitions are considered non-null`` () =
                                     "name", upcast "Int"
                                     "ofType", null]]]]]]]]
     noErrors result
-    result.["data"] |> equals (upcast expected) 
-    
+    result.["data"] |> equals (upcast expected)
+
 [<Fact>]
 let ``Nullable field args type definitions are considered nullable`` () =
     let root = Define.Object("Query", [ Define.Field("onlyField", String, "", [ Define.Input("onlyArg", Nullable Int) ], fun _ () -> null) ])
@@ -247,7 +247,7 @@ let ``Nullable field args type definitions are considered nullable`` () =
                                 "name", upcast "Int"
                                 "ofType", null ]]]]]]]
     noErrors result
-    result.["data"] |> equals (upcast expected) 
+    result.["data"] |> equals (upcast expected)
 
 [<Fact(Skip = "Investigate and fix the test, introspeciton is already working")>]
 let ``Introspection executes an introspection query`` () =

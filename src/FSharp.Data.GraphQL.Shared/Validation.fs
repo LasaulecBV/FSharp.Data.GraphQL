@@ -30,26 +30,26 @@ let validateImplements (objdef: ObjectDef) (idef: InterfaceDef) =
     match errors with
     | [] -> Success
     | err -> Error err
-            
+
 let validateType (namedTypes: Map<string, NamedDef>) typedef =
     match typedef with
     | Scalar scalardef -> Success
-    | Object objdef -> 
+    | Object objdef ->
         let nonEmptyResult = if objdef.Fields.Count > 0 then Success else Error [ objdef.Name + " must have at least one field defined" ]
         let implementsResult =
             objdef.Implements
             |> Array.fold (fun acc i -> acc @ validateImplements objdef i) Success
         nonEmptyResult @ implementsResult
-    | InputObject indef -> 
+    | InputObject indef ->
         let nonEmptyResult = if indef.Fields.Length > 0 then Success else Error [ indef.Name + " must have at least one field defined" ]
         nonEmptyResult
     | Union uniondef ->
         let nonEmptyResult = if uniondef.Options.Length > 0 then Success else Error [ uniondef.Name + " must have at least one type definition option" ]
         nonEmptyResult
-    | Enum enumdef -> 
+    | Enum enumdef ->
         let nonEmptyResult = if enumdef.Options.Length > 0 then Success else Error [ enumdef.Name + " must have at least one enum value defined" ]
         nonEmptyResult
-    | Interface idef -> 
+    | Interface idef ->
         let nonEmptyResult = if idef.Fields.Length > 0 then Success else Error [ idef.Name + " must have at least one field defined" ]
         nonEmptyResult
     | _ -> failwithf "Unexpected value of typedef: %O" typedef

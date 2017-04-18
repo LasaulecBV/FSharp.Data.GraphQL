@@ -14,7 +14,7 @@ and Definition =
     | FragmentDefinition of FragmentDefinition
     member x.Name
       with get () =
-        match x with 
+        match x with
         | OperationDefinition op -> op.Name
         | FragmentDefinition frag -> frag.Name
 
@@ -22,18 +22,18 @@ and Definition =
 and OperationDefinition = {
     OperationType: OperationType
     Name: string option
-    VariableDefinitions: VariableDefinition list 
+    VariableDefinitions: VariableDefinition list
     Directives: Directive list
     SelectionSet: Selection list
 }
 
-and OperationType = 
+and OperationType =
     | Query
     | Mutation
     | Subscription
 
 /// 2.2.2 Selection Sets
-and Selection = 
+and Selection =
     | Field of Field
     | FragmentSpread of FragmentSpread
     /// 2.2.6.2 Inline Fragments
@@ -45,7 +45,7 @@ and Selection =
         | InlineFragment f -> f.Directives
 
 /// 2.2.3 Fields
-and Field = 
+and Field =
     {
         /// 2.2.5 Field Alias
         Alias: string option
@@ -54,7 +54,7 @@ and Field =
         Directives: Directive list
         SelectionSet: Selection list
     }
-    member x.AliasOrName = 
+    member x.AliasOrName =
         match x.Alias with
         | Some alias -> alias
         | None -> x.Name
@@ -80,7 +80,7 @@ and FragmentDefinition = {
 }
 
 /// 2.2.7 Input Values
-and Value = 
+and Value =
     /// 2.2.7.1 Int Value
     | IntValue of int64
     /// 2.2.7.2 Float Value
@@ -99,13 +99,13 @@ and Value =
     | Variable of string
 
 /// 2.2.8 Variables
-and VariableDefinition = 
+and VariableDefinition =
     { VariableName: string
       Type: InputType
       DefaultValue: Value option }
 
 /// 2.2.9 Input Types
-and InputType = 
+and InputType =
     | NamedType of string
     | ListType of InputType
     | NonNullType of InputType
@@ -117,7 +117,7 @@ and InputType =
         str x
 
 /// 2.2.10 Directives
-and Directive = 
+and Directive =
     {
         Name: string
         Arguments: Argument list
@@ -180,5 +180,3 @@ and TypeDefinition =
     | UnionTypeDefinition of UnionTypeDefinition
     | EnumTypeDefinition of EnumTypeDefinition
     | InputObjectTypeDefinition of InputObjectTypeDefinition
-
-        

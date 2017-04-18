@@ -11,22 +11,22 @@ open FSharp.Data.GraphQL.Parser
 open FSharp.Data.GraphQL.Execution
 
 type NumberHolder = { mutable Number: int }
-type Root = 
+type Root =
     {
         NumberHolder: NumberHolder
     }
-    member x.ChangeImmediatelly num = 
+    member x.ChangeImmediatelly num =
         x.NumberHolder.Number <- num
         x.NumberHolder
-    member x.AsyncChange num = 
-        async { 
-            x.NumberHolder.Number <- num 
+    member x.AsyncChange num =
+        async {
+            x.NumberHolder.Number <- num
             return x.NumberHolder
-        }    
-    member x.ChangeFail(num): NumberHolder = 
+        }
+    member x.ChangeFail(num): NumberHolder =
         failwith "Cannot change number"
-    member x.AsyncChangeFail(num): Async<NumberHolder> = 
-        async { 
+    member x.AsyncChangeFail(num): Async<NumberHolder> =
+        async {
             return failwith "Cannot change number"
         }
 
@@ -74,7 +74,7 @@ let ``Execute handles mutation execution ordering: evaluates mutations serially`
     ]
     noErrors mutationResult
     mutationResult.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles mutation execution ordering: evaluates mutations correctly in the presense of failures`` () =
     let query = """mutation M {

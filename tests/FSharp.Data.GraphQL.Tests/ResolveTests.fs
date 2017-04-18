@@ -10,7 +10,7 @@ open FSharp.Data.GraphQL.Types
 open FSharp.Data.GraphQL.Parser
 open FSharp.Data.GraphQL.Execution
 
-type TestData = 
+type TestData =
     { Test: string }
     member x.TestMethod (a: string) (b: int) = x.Test + a + b.ToString()
     member x.AsyncTestMethod (a: string) (b: int) = async { return x.Test + a + b.ToString() }
@@ -23,7 +23,7 @@ let ``Execute uses default resolve to accesses properties`` () =
     let actual = sync <| Executor(schema).AsyncExecute(parse "{ test }", { Test = "testValue" })
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-            
+
 [<Fact>]
 let ``Execute uses provided resolve function to accesses properties`` () =
     let schema = testSchema [ Define.Field("test", String, "", [ Define.Input("a", String) ], resolve = fun ctx d -> d.Test + ctx.Arg("a")) ]

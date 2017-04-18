@@ -19,7 +19,7 @@ let TestComplexScalar =
     coerceInput = (fun (StringValue value) -> if value = "SerializedValue" then Some "DeserializedValue" else None),
     coerceValue = (fun value -> if value = upcast "DeserializedValue" then Some "SerializedValue" else None))
 
-type TestInput = { 
+type TestInput = {
     a: string option
     b: string option seq option
     c: string
@@ -77,7 +77,7 @@ let ``Execute handles objects and nullability using inline structs with complex 
     let expected = NameValueLookup.ofList [ "fieldWithObjectInput", upcast """{"a":"foo","b":["bar"],"c":"baz","d":null}""" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles objects and nullability using inline structs and properly parses single value to list`` () =
     let ast = parse """{ fieldWithObjectInput(input: {a: "foo", b: "bar", c: "baz"}) }"""
@@ -85,7 +85,7 @@ let ``Execute handles objects and nullability using inline structs and properly 
     let expected = NameValueLookup.ofList [ "fieldWithObjectInput", upcast """{"a":"foo","b":["bar"],"c":"baz","d":null}""" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles objects and nullability using inline structs and doesn't use incorrect value`` () =
     let ast = parse """{ fieldWithObjectInput(input: ["foo", "bar", "baz"]) }"""
@@ -93,7 +93,7 @@ let ``Execute handles objects and nullability using inline structs and doesn't u
     let expected = NameValueLookup.ofList [ "fieldWithObjectInput", upcast "null" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles objects and nullability using inline structs and proprely coerces complex scalar types`` () =
     let ast = parse """{ fieldWithObjectInput(input: {a: "foo", d: "SerializedValue"}) }"""
@@ -101,7 +101,7 @@ let ``Execute handles objects and nullability using inline structs and proprely 
     let expected = NameValueLookup.ofList [ "fieldWithObjectInput", upcast """{"a":"foo","b":null,"c":null,"d":"DeserializedValue"}"""]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles variables with complex inputs`` () =
     let ast = parse """query q($input: TestInputObject) {
@@ -113,7 +113,7 @@ let ``Execute handles variables with complex inputs`` () =
     let expected = NameValueLookup.ofList [ "fieldWithObjectInput", upcast """{"a":"foo","b":["bar"],"c":"baz","d":null}""" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles variables with default value when no value was provided`` () =
     let ast = parse """query q($input: TestInputObject = {a: "foo", b: ["bar"], c: "baz"}) {
@@ -123,7 +123,7 @@ let ``Execute handles variables with default value when no value was provided`` 
     let expected = NameValueLookup.ofList [ "fieldWithObjectInput", upcast """{"a":"foo","b":["bar"],"c":"baz","d":null}""" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-        
+
 [<Fact>]
 let ``Execute handles variables and errors on null for nested non-nulls`` () =
     let ast = parse """query q($input: TestInputObject) {
@@ -137,7 +137,7 @@ let ``Execute handles variables and errors on null for nested non-nulls`` () =
             "c", null]]
     let actual = sync <| Executor(schema).AsyncExecute(ast, variables = params')
     hasError "Variable '$input': in input object 'TestInputObject': in field 'c': expected value of type String but got None" (downcast actual.["errors"])
-    
+
 [<Fact>]
 let ``Execute handles variables and errors on incorrect type`` () =
     let ast = parse """query q($input: TestInputObject) {
@@ -147,7 +147,7 @@ let ``Execute handles variables and errors on incorrect type`` () =
     let actual = sync <| Executor(schema).AsyncExecute(ast, variables = params')
     let errMsg = sprintf " Variable '$input': value of type %O is not assignable from %O" typeof<TestInput> typeof<string>
     hasError errMsg (downcast actual.["errors"])
-    
+
 [<Fact>]
 let ``Execute handles variables and errors on omission of nested non-nulls`` () =
     let ast = parse """query q($input: TestInputObject) {
@@ -169,7 +169,7 @@ let ``Execute handles variables and allows nullable inputs to be omitted`` () =
     let expected = NameValueLookup.ofList [ "fieldWithNullableStringInput", upcast "null" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles variables and allows nullable inputs to be omitted in a variable`` () =
     let ast = parse """query SetsNullable($value: String) {
@@ -179,7 +179,7 @@ let ``Execute handles variables and allows nullable inputs to be omitted in a va
     let expected = NameValueLookup.ofList [ "fieldWithNullableStringInput", upcast "null" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles variables and allows nullable inputs to be omitted in an unlisted variable`` () =
     let ast = parse """query SetsNullable {
@@ -189,7 +189,7 @@ let ``Execute handles variables and allows nullable inputs to be omitted in an u
     let expected = NameValueLookup.ofList [ "fieldWithNullableStringInput", upcast "null" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles variables and allows nullable inputs to be set to null in a variable`` () =
     let ast = parse """query SetsNullable($value: String) {
@@ -199,7 +199,7 @@ let ``Execute handles variables and allows nullable inputs to be set to null in 
     let expected = NameValueLookup.ofList [ "fieldWithNullableStringInput", upcast "null" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles variables and allows nullable inputs to be set to a value in a variable`` () =
     let ast = parse """query SetsNullable($value: String) {
@@ -209,7 +209,7 @@ let ``Execute handles variables and allows nullable inputs to be set to a value 
     let expected = NameValueLookup.ofList [ "fieldWithNullableStringInput", upcast "\"a\"" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles variables and allows nullable inputs to be set to a value directly`` () =
     let ast = parse """{ fieldWithNullableStringInput(input: "a") }"""
@@ -225,7 +225,7 @@ let ``Execute handles non-nullable scalars and does not allow non-nullable input
         }"""
     let actual = sync <| Executor(schema).AsyncExecute(ast, variables = Map.ofList [ "value", null ])
     hasError "Variable '$value': expected value of type String but got None" (downcast actual.["errors"])
-    
+
 [<Fact>]
 let ``Execute handles non-nullable scalars and allows non-nullable inputs to be set to a value in a variable`` () =
     let ast = parse """query SetsNonNullable($value: String!) {
@@ -235,7 +235,7 @@ let ``Execute handles non-nullable scalars and allows non-nullable inputs to be 
     let expected = NameValueLookup.ofList [ "fieldWithNonNullableStringInput", upcast "\"a\"" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles non-nullable scalars and allows non-nullable inputs to be set to a value directly`` () =
     let ast = parse """{ fieldWithNonNullableStringInput(input: "a") }"""
@@ -243,7 +243,7 @@ let ``Execute handles non-nullable scalars and allows non-nullable inputs to be 
     let expected = NameValueLookup.ofList [ "fieldWithNonNullableStringInput", upcast "\"a\"" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles non-nullable scalars and passes along null for non-nullable inputs if explcitly set in the query`` () =
     let ast = parse """{ fieldWithNonNullableStringInput }"""
@@ -251,7 +251,7 @@ let ``Execute handles non-nullable scalars and passes along null for non-nullabl
     let expected = NameValueLookup.ofList [ "fieldWithNonNullableStringInput", upcast "null" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and allows lists to be null`` () =
     let ast = parse """query q($input: [String]) {
@@ -261,7 +261,7 @@ let ``Execute handles list inputs and nullability and allows lists to be null`` 
     let expected = NameValueLookup.ofList [ "list", upcast "null" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and allows lists to contain values`` () =
     let ast = parse """query q($input: [String]) {
@@ -272,7 +272,7 @@ let ``Execute handles list inputs and nullability and allows lists to contain va
     let expected = NameValueLookup.ofList [ "list", upcast "[\"A\"]" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and allows lists to contain null`` () =
     let ast = parse """query q($input: [String]) {
@@ -282,7 +282,7 @@ let ``Execute handles list inputs and nullability and allows lists to contain nu
     let expected = NameValueLookup.ofList [ "list", upcast "[\"A\",null,\"B\"]" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and does not allow non-null lists to be null`` () =
     let ast = parse """query q($input: [String]!) {
@@ -290,7 +290,7 @@ let ``Execute handles list inputs and nullability and does not allow non-null li
         }"""
     let actual = sync <| Executor(schema).AsyncExecute(ast, variables = Map.ofList [ "input", null ])
     hasError "Variable '$input': expected value of type [String]!, but no value was found" (downcast actual.["errors"])
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and allows non-null lists to contain values`` () =
     let ast = parse """query q($input: [String]!) {
@@ -300,7 +300,7 @@ let ``Execute handles list inputs and nullability and allows non-null lists to c
     let expected = NameValueLookup.ofList [ "nnList", upcast "[\"A\"]" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and allows non-null lists to contain null`` () =
     let ast = parse """query q($input: [String]!) {
@@ -310,7 +310,7 @@ let ``Execute handles list inputs and nullability and allows non-null lists to c
     let expected = NameValueLookup.ofList [ "nnList", upcast "[\"A\",null,\"B\"]" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and allows lists of non-nulls to be null`` () =
     let ast = parse """query q($input: [String!]) {
@@ -320,7 +320,7 @@ let ``Execute handles list inputs and nullability and allows lists of non-nulls 
     let expected = NameValueLookup.ofList [ "listNN", upcast "null" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and allows lists of non-nulls to contain values`` () =
     let ast = parse """query q($input: [String!]) {
@@ -330,7 +330,7 @@ let ``Execute handles list inputs and nullability and allows lists of non-nulls 
     let expected = NameValueLookup.ofList [ "listNN", upcast "[\"A\"]" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and does not allow lists of non-nulls to contain null`` () =
     let ast = parse """query q($input: [String!]) {
@@ -338,7 +338,7 @@ let ``Execute handles list inputs and nullability and does not allow lists of no
         }"""
     let actual = sync <| Executor(schema).AsyncExecute(ast, variables = Map.ofList [ "input", [ "A":> obj; null; "B" :> obj ] :> obj ])
     hasError "Variable '$input': list element expected value of type String but got None" (downcast actual.["errors"])
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and does not allow non-null lists of non-nulls to be null`` () =
     let ast = parse """query q($input: [String!]!) {
@@ -346,7 +346,7 @@ let ``Execute handles list inputs and nullability and does not allow non-null li
         }"""
     let actual = sync <| Executor(schema).AsyncExecute(ast, variables = Map.ofList [ "input", null ])
     hasError "Variable '$input': expected value of type [String!]!, but no value was found" (downcast actual.["errors"])
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and does not allow non-null lists of non-nulls to contain values`` () =
     let ast = parse """query q($input: [String!]!) {
@@ -356,7 +356,7 @@ let ``Execute handles list inputs and nullability and does not allow non-null li
     let expected = NameValueLookup.ofList [ "nnListNN", upcast "[\"A\"]" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and does not allow non-null lists of non-nulls to contain null`` () =
     let ast = parse """query q($input: [String!]!) {
@@ -364,7 +364,7 @@ let ``Execute handles list inputs and nullability and does not allow non-null li
         }"""
     let actual = sync <| Executor(schema).AsyncExecute(ast, variables = Map.ofList [ "input", [ "A":> obj; null; "B" :> obj ] :> obj ])
     hasError "Variable '$input': list element expected value of type String but got None" (downcast actual.["errors"])
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and does not allow invalid types to be used as values`` () =
     let ast = parse """query q($input: TestType!) {
@@ -374,9 +374,9 @@ let ``Execute handles list inputs and nullability and does not allow invalid typ
     let e = throws<MalformedQueryException> (fun () ->
         Executor(schema).AsyncExecute(ast, variables = Map.ofList [ "input", [ "A":> obj, "B" :> obj ] :> obj ])
         |> sync
-        |> ignore)        
+        |> ignore)
     e.Message |> equals "GraphQL query defined variable '$input' of type 'TestType!' which is not an input type definition"
-    
+
 [<Fact>]
 let ``Execute handles list inputs and nullability and does not allow unknown types to be used as values`` () =
     let ast = parse """query q($input: UnknownType!) {
@@ -384,11 +384,11 @@ let ``Execute handles list inputs and nullability and does not allow unknown typ
         }"""
     // as that kind of an error inside of a query is guaranteed to fail in every call, we're gonna to fail noisy here
     let e = throws<MalformedQueryException> (fun () ->
-        Executor(schema).AsyncExecute(ast, variables = Map.ofList [ "input", "whoknows" :> obj ]) 
+        Executor(schema).AsyncExecute(ast, variables = Map.ofList [ "input", "whoknows" :> obj ])
         |> sync
         |> ignore)
     e.Message |> equals "GraphQL query defined variable '$input' of type 'UnknownType!' which is not known in the current schema"
-    
+
 [<Fact>]
 let ``Execute uses argument default value when no argument was provided`` () =
     let ast = parse """{ fieldWithDefaultArgumentValue }"""
@@ -396,7 +396,7 @@ let ``Execute uses argument default value when no argument was provided`` () =
     let expected = NameValueLookup.ofList [ "fieldWithDefaultArgumentValue", upcast "\"hello world\"" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute uses argument default value when nullable variable provided`` () =
     let ast = parse """query optionalVariable($optional: String) {
@@ -406,7 +406,7 @@ let ``Execute uses argument default value when nullable variable provided`` () =
     let expected = NameValueLookup.ofList [ "fieldWithDefaultArgumentValue", upcast "\"hello world\"" ]
     noErrors actual
     actual.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
 let ``Execute uses argument default value when argument provided cannot be parsed`` () =
     let ast = parse """{ fieldWithDefaultArgumentValue(input: WRONG_TYPE) }"""

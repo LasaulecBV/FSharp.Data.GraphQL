@@ -14,14 +14,14 @@ open FSharp.Data.GraphQL.Relay
 type IPet =
     interface
         abstract Name : string
-    end 
+    end
 
-type Dog = 
+type Dog =
     { Name: string; Woofs: bool }
     interface IPet with
         member x.Name = x.Name
 
-type Cat = 
+type Cat =
     { Name: string; Meows: bool }
     interface IPet with
         member x.Name = x.Name
@@ -37,11 +37,11 @@ let resolvePet = function
     | CatCase c -> upcast c
 
 [<Fact>]
-let ``Execute handles execution of abstract types: isTypeOf is used to resolve runtime type for Interface`` () = 
+let ``Execute handles execution of abstract types: isTypeOf is used to resolve runtime type for Interface`` () =
     let PetType = Define.Interface("Pet", fun () -> [ Define.Field("name", String) ])
     let DogType =
       Define.Object<Dog>(
-        name = "Dog", 
+        name = "Dog",
         isTypeOf = is<Dog>,
         interfaces = [ PetType ],
         fields = [
@@ -50,7 +50,7 @@ let ``Execute handles execution of abstract types: isTypeOf is used to resolve r
         ])
     let CatType =
       Define.Object<Cat>(
-        name = "Cat", 
+        name = "Cat",
         isTypeOf = is<Cat>,
         interfaces = [ PetType ],
         fields = [
@@ -62,7 +62,7 @@ let ``Execute handles execution of abstract types: isTypeOf is used to resolve r
         query = Define.Object("Query", fun () ->
         [
             Define.Field("pets", ListOf PetType, fun _ _ -> [ { Name = "Odie"; Woofs = true } :> IPet ; upcast { Name = "Garfield"; Meows = false } ])
-        ]), 
+        ]),
         config = { SchemaConfig.Default with Types = [CatType; DogType] })
     let schemaProcessor = Executor(schema)
     let query = """{
@@ -88,12 +88,12 @@ let ``Execute handles execution of abstract types: isTypeOf is used to resolve r
                 "meows", upcast false]]]
     noErrors result
     result.["data"] |> equals (upcast expected)
-    
+
 [<Fact>]
-let ``Execute handles execution of abstract types: isTypeOf is used to resolve runtime type for Union`` () = 
+let ``Execute handles execution of abstract types: isTypeOf is used to resolve runtime type for Union`` () =
     let DogType =
       Define.Object<Dog>(
-        name = "Dog", 
+        name = "Dog",
         isTypeOf = is<Dog>,
         fields = [
             Define.AutoField("name", String)
@@ -101,7 +101,7 @@ let ``Execute handles execution of abstract types: isTypeOf is used to resolve r
         ])
     let CatType =
       Define.Object<Cat>(
-        name = "Cat", 
+        name = "Cat",
         isTypeOf = is<Cat>,
         fields = [
             Define.AutoField("name", String)
@@ -142,18 +142,18 @@ let ``Execute handles execution of abstract types: isTypeOf is used to resolve r
 
 
 
-type Widget = 
+type Widget =
    { Id: string;
        Name: string }
 
-type User = 
+type User =
    { Id: string;
        Name: string;
        Widgets: Widget list }
 
 
 [<Fact>]
-let ``inner types `` () = 
+let ``inner types `` () =
    let viewer = {
        Id = "1"
        Name = "Anonymous"
@@ -177,10 +177,10 @@ let ``inner types `` () =
    //and WidgetConnection = ConnectionOf Widget
    and WidgetsField name (getUser: ResolveFieldContext -> 'a -> User) =
        let resolve ctx xx =
-           let user = getUser ctx xx 
+           let user = getUser ctx xx
            let widgets = user.Widgets |> List.toArray
            Connection.ofArray widgets
-    
+
        Define.Field(name, ConnectionOf Widget, "A person's collection of widgets", Connection.allArgs, resolve)
 
 
@@ -200,7 +200,7 @@ let ``inner types `` () =
    let Query =
        Define.Object("Query",
            [
-           Define.NodeField(Node, fun ctx () id -> 
+           Define.NodeField(Node, fun ctx () id ->
                match id with
                | GlobalId("User", i) -> getUser i |> Option.map box
                | GlobalId("Widget", i) -> getWidget i |> Option.map box
@@ -213,12 +213,12 @@ let ``inner types `` () =
 
    let schema = Schema(query = Query, config = { SchemaConfig.Default with Types = [ User; Widget ]})
    let schemaProcessor = Executor(schema)
-    
+
    let query = "{
                    viewer {name}, widgets { edges }
                 }"
    let q = query.Trim().Replace("\r\n", " ")
 
    let result = sync <| schemaProcessor.AsyncExecute(parse query)
-    
-   noErrors result  
+
+   noErrors result

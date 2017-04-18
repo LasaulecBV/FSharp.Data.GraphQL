@@ -11,9 +11,9 @@ open FSharp.Data.GraphQL.Types
 open FSharp.Data.GraphQL.Types.Introspection
 open FSharp.Data.GraphQL.Execution
 
-let equals (expected : 'x) (actual : 'x) = 
+let equals (expected : 'x) (actual : 'x) =
     Assert.True((actual = expected), sprintf "expected %+A\nbut got %+A" expected actual)
-let notEquals (expected : 'x) (actual : 'x) = 
+let notEquals (expected : 'x) (actual : 'x) =
     Assert.True((actual <> expected), sprintf "unexpected %+A" expected)
 let noErrors (result: IDictionary<string, obj>) =
     match result.TryGetValue("errors") with
@@ -23,17 +23,17 @@ let throws<'e when 'e :> exn> (action : unit -> unit) = Assert.Throws<'e>(action
 let sync = Async.RunSynchronously
 let is<'t> (o: obj) = o :? 't
 let hasError errMsg (errors: string seq) =
-    let containsMessage = 
+    let containsMessage =
         errors
         |> Seq.exists (fun e -> e.Contains(errMsg))
     Assert.True (containsMessage, sprintf "expected to contain message '%s', but no such message was found. Messages found: %A" errMsg errors)
 
-let (<??) opt other = 
+let (<??) opt other =
     match opt with
     | None -> Some other
     | _ -> opt
 
-let undefined (value: 't) = 
+let undefined (value: 't) =
     Assert.True((value = Unchecked.defaultof<'t>), sprintf "Expected value to be undefined, but was: %A" value)
 
 open System
@@ -44,30 +44,30 @@ open Microsoft.FSharp.Reflection
 
 type internal OptionConverter() =
     inherit JsonConverter()
-    
-    override x.CanConvert(t) = 
+
+    override x.CanConvert(t) =
 #if NETSTANDARD1_6
         t.GetTypeInfo().IsGenericType && t.GetTypeInfo().GetGenericTypeDefinition() = typedefof<option<_>>
-#else    
+#else
         t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<option<_>>
 #endif
     override x.WriteJson(writer, value, serializer) =
-        let value = 
+        let value =
             if value = null then null
-            else 
+            else
                 let _,fields = Microsoft.FSharp.Reflection.FSharpValue.GetUnionFields(value, value.GetType())
-                fields.[0]  
+                fields.[0]
         serializer.Serialize(writer, value)
 
-    override x.ReadJson(reader, t, existingValue, serializer) = 
+    override x.ReadJson(reader, t, existingValue, serializer) =
 #if NETSTANDARD1_6
         let innerType = t.GetGenericArguments().[0]
-        let innerType = 
+        let innerType =
             if innerType.GetTypeInfo().IsValueType then (typedefof<Nullable<_>>).GetTypeInfo().MakeGenericType([|innerType|])
-            else innerType 
+            else innerType
 #else
         let innerType = t.GetGenericArguments().[0]
-        let innerType = 
+        let innerType =
             if innerType.IsValueType then (typedefof<Nullable<_>>).MakeGenericType([|innerType|])
             else innerType
 #endif
