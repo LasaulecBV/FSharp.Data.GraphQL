@@ -33,7 +33,7 @@ let gitOwner = "bazingatechnologies"
 let gitHome = "https://github.com/" + gitOwner
 let gitName = "FSharp.Data.GraphQL"
 let gitRaw = environVarOrDefault "gitRaw" "https://raw.github.com/bazingatechnologies"
-let version = "0.0.3"
+let version = "0.0.4"
 let prerelease = "beta"
 let release = { (LoadReleaseNotes "RELEASE_NOTES.md") with AssemblyVersion = version; NugetVersion = (sprintf "%s-%s" version prerelease); }
 
