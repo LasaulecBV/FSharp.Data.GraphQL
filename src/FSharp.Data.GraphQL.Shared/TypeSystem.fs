@@ -26,6 +26,13 @@ type DirectiveLocation =
     | FRAGMENT_SPREAD = 32
     | INLINE_FRAGMENT = 64
 
+/// Definition of GraphQL error
+type GraphQLError =
+    { /// Description of error
+      Message: string
+      /// List of locations in query  where error occured
+      Locations: string array }
+
 module Introspection =
 
     /// Type kind. GraphQL type system puts all types into one of eight categories.
@@ -318,7 +325,7 @@ type ISchema =
         /// Returns an introspected representation of current schema.
         abstract Introspected : Introspection.IntrospectionSchema
 
-        abstract ParseErrors : exn[] -> string[]
+        abstract ParseErrors : exn[] -> GraphQLError[]
     end
 
 and ISchema<'Root> = 

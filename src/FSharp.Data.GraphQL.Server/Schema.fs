@@ -14,13 +14,6 @@ open FSharp.Data.GraphQL.Introspection
 open FSharp.Data.GraphQL.Planning
 open FSharp.Data.GraphQL.Execution
 
-/// Definition of GraphQL error
-type GraphQLError =
-    { /// Description of error
-      Message: string
-      /// List of locations in query  where error occured
-      Locations: string array }
-
 /// A configuration object fot the GraphQL server schema.
 type SchemaConfig =
     { /// List of types that couldn't be resolved from schema query root
