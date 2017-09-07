@@ -221,16 +221,17 @@ let rec private createCompletion (possibleTypesFn: TypeDef -> ObjectDef []) (ret
         let innerfn = createCompletion possibleTypesFn innerdef fieldExecuteMap
         let optionDef = typedefof<option<_>>
         fun ctx value ->
-            let t = value.GetType()
             if value = null then AsyncVal.empty
+            else
+              let t = value.GetType()
 #if NETSTANDARD1_6
-            elif t.GetTypeInfo().IsGenericType && t.GetTypeInfo().GetGenericTypeDefinition() = optionDef then
+              if t.GetTypeInfo().IsGenericType && t.GetTypeInfo().GetGenericTypeDefinition() = optionDef then
 #else
-            elif t.IsGenericType && t.GetGenericTypeDefinition() = optionDef then
+              if t.IsGenericType && t.GetGenericTypeDefinition() = optionDef then
 #endif
-                let _, fields = Microsoft.FSharp.Reflection.FSharpValue.GetUnionFields(value, t)
-                innerfn ctx fields.[0]
-            else innerfn ctx value
+                  let _, fields = Microsoft.FSharp.Reflection.FSharpValue.GetUnionFields(value, t)
+                  innerfn ctx fields.[0]
+              else innerfn ctx value
 
     | Interface idef ->
         let resolver = resolveInterfaceType possibleTypesFn idef
