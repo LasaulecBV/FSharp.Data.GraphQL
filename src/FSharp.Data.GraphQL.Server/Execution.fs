@@ -275,6 +275,8 @@ and internal compileField possibleTypesFn (fieldDef: FieldDef) (fieldExecuteMap:
                 then AsyncVal.empty
                 else completed resolveFieldCtx res
             with
+            | :? NotAuthorizedException as e ->
+                raise e
             | :? AggregateException as e ->
                 e.InnerExceptions |> Seq.iter (resolveFieldCtx.AddError)
                 AsyncVal.empty

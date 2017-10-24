@@ -1,5 +1,7 @@
 ﻿namespace FSharp.Data.GraphQL
 
+open System
+open FSharp.Data.GraphQL
 open System.Collections.Generic
 open FSharp.Data.GraphQL.Types
 open FSharp.Data.GraphQL.Execution
@@ -46,6 +48,9 @@ type Executor<'Root> (schema: ISchema<'Root>) =
                 let! result = res |> AsyncVal.map (fun x -> NameValueLookup.ofList (prepareOutput errors x))
                 return result :> IDictionary<string,obj>
             with
+            | :? NotAuthorizedException as e ->
+                raise (NotAuthorizedException "")
+                return upcast NameValueLookup.ofList []
             | ex ->
                 let msg = ex.ToString()
                 return upcast NameValueLookup.ofList [ "errors", upcast [ msg ]]
