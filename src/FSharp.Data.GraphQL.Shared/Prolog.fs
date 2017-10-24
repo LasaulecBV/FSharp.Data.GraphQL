@@ -13,6 +13,9 @@ type GraphQLException(msg) =
 type MalformedQueryException(msg) =
     inherit GraphQLException(msg)
 
+type NotAuthorizedException(msg) =
+    inherit Exception(msg)
+
 module internal Array =
 
     /// <summary>
