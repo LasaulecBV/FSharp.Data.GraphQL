@@ -1,0 +1,20 @@
+type file
+id FSharp.Data.GraphQL.Server
+authors Bazinga Technologies Inc
+projectUrl https://github.com/bazingatechnologies/FSharp.Data.GraphQL
+licenseUrl https://github.com/bazingatechnologies/FSharp.Data.GraphQL/blob/dev/LICENSE.txt
+requireLicenseAcceptance false
+copyright Copyright (c) 2016 Bazinga Technologies Inc
+tags
+    FSharp GraphQL Relay React
+summary
+    FSharp implementation of Facebook GraphQL query language (Server)
+description
+    FSharp implementation of Facebook GraphQL query language (Server)
+files
+  bin/Release/netstandard1.6 ==> lib/netstandard1.6
+  !bin/Release/**/*.json
+dependencies
+  FSharp.Core >= 4.2.3
+  System.Reactive >= 3.1.1
+  FParsec >= 1.0.3
